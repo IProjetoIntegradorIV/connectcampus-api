@@ -1,0 +1,13 @@
+package com.connectcampus.api;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class ConnectcampusApiApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
