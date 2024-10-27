@@ -1,6 +1,8 @@
 package com.connectcampus.api.controller;
 
 import com.connectcampus.api.model.LoginRequest;
+import com.connectcampus.api.model.LoginResponse;
+import com.connectcampus.api.model.ResponseMessage;
 import com.connectcampus.api.model.User;
 import com.connectcampus.api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,39 +20,46 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    public UserController() {}
+    public UserController() {
+        System.out.println("UserController instantiated");
+    }
+
+    @GetMapping
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 
     @PostMapping
-    public ResponseEntity<String> createUser(@RequestBody User user) {
+    public ResponseEntity<ResponseMessage> createUser(@RequestBody User user) {
         Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
         if (existingUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("User already exists.");
+                    .body(new ResponseMessage("A user with this email already exists."));
         }
 
         try {
-            userRepository.save(user);
+            User savedUser = userRepository.save(user);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Account created successfully.");
+                    .body(new ResponseMessage("Account created successfully!"));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: " + e.getMessage());
+                    .body(new ResponseMessage("Error creating the account."));
         }
     }
 
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest loginRequest) {
         Optional<User> optionalUser = userRepository.findByEmail(loginRequest.getEmail());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             if (user.getPassword().equals(loginRequest.getPassword())) {
-                return ResponseEntity.ok("Login successful.");
+                return ResponseEntity.ok(new LoginResponse("Login Successful!", true));
             }
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("credentials invalid.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new LoginResponse("Invalid email or password.", false));
     }
-
 
 }
