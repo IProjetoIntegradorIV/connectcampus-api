@@ -18,35 +18,26 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    public UserController() {
-        System.out.println("UserController instantiated");
-    }
-
-    @GetMapping
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+    public UserController() {}
 
     @PostMapping
     public ResponseEntity<String> createUser(@RequestBody User user) {
         Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
         if (existingUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Um usuário com esse email já existe.");
+                    .body("User already exists.");
         }
 
         try {
-            User savedUser = userRepository.save(user);
+            userRepository.save(user);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Conta criada com sucesso!");
+                    .body("Account created successfully.");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro ao criar a conta.");
+                    .body("Error: " + e.getMessage());
         }
     }
-
-
 
 
     @PostMapping("/login")
@@ -54,11 +45,11 @@ public class UserController {
         Optional<User> optionalUser = userRepository.findByEmail(loginRequest.getEmail());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            if (user.getSenha().equals(loginRequest.getSenha())) {
-                return ResponseEntity.ok("Login bem-sucedido!");
+            if (user.getPassword().equals(loginRequest.getPassword())) {
+                return ResponseEntity.ok("Login successful.");
             }
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha inválidos.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("credentials invalid.");
     }
 
 
