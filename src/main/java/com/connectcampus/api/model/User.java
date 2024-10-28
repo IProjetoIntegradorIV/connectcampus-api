@@ -3,18 +3,20 @@ package com.connectcampus.api.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "User")
+@Document(collection = "users")
 public class User {
     @Id
     private String id;
     private String name;
     private String email;
     private String password;
+    private String photo;
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, String photo) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.photo = photo;
     }
 
     public String getId() {
@@ -47,5 +49,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 }
