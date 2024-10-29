@@ -1,9 +1,7 @@
 package com.connectcampus.api.controller;
 
-import com.connectcampus.api.model.GoogleLoginRequest;
-import com.connectcampus.api.model.LoginRequest;
-import com.connectcampus.api.model.LoginResponse;
-import com.connectcampus.api.model.User;
+import com.connectcampus.api.model.*;
+import com.connectcampus.api.repository.EstablishmentRepository;
 import com.connectcampus.api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +14,7 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -79,21 +78,36 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createUser(@RequestBody User user) {
+    public ResponseEntity<ResponseMessage> createUser(@RequestBody User user) {
         Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
         if (existingUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("User already exists.");
+                    .body(new ResponseMessage("User already exists."));
         }
 
         try {
             userRepository.save(user);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Account created successfully.");
+                    .body(new ResponseMessage("Account created successfully."));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: " + e.getMessage());
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+
+    @Autowired
+    private EstablishmentRepository establishmentRepository;
+
+    @GetMapping("/establishments")
+    public ResponseEntity<List<Establishment>> getAllEstablishments() {
+        try {
+            List<Establishment> establishments = establishmentRepository.findAll();
+            return ResponseEntity.ok(establishments);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }
