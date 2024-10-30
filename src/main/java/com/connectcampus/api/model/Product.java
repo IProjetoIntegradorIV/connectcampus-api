@@ -12,15 +12,17 @@ public class Product {
     private String description;
     private String evaluation;
     private String photo;
+    private String price;
 
     public Product() {}
 
-    public Product(String establishmentId, String name, String description, String evaluation, String photo) {
+    public Product(String establishmentId, String name, String description, String evaluation, String photo, String price) {
         this.establishmentId = establishmentId;
         this.name = name;
         this.description = description;
         this.evaluation = evaluation;
         this.photo = photo;
+        this.price = price;
     }
 
     public String getId() {
@@ -70,5 +72,13 @@ public class Product {
 
     public void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    public String getPrice(){
+        return price;
+    }
+
+    public void setPrice(String price){
+        this.price = price;
     }
 }

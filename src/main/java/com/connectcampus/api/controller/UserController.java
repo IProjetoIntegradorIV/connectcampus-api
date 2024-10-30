@@ -112,6 +112,18 @@ public class UserController {
         }
     }
 
+    @GetMapping("/establishments/{id}")
+    public ResponseEntity<Establishment> getEstablishmentById(@PathVariable("id") String id) {
+        try {
+            Optional<Establishment> establishment = establishmentRepository.findById(id);
+            return establishment.map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @Autowired
     private ProductRepository productRepository;
 
