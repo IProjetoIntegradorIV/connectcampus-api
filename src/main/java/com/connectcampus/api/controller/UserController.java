@@ -2,6 +2,7 @@ package com.connectcampus.api.controller;
 
 import com.connectcampus.api.model.*;
 import com.connectcampus.api.repository.EstablishmentRepository;
+import com.connectcampus.api.repository.ProductRepository;
 import com.connectcampus.api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -110,4 +111,19 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @GetMapping("/establishments/{establishmentId}/products")
+    public ResponseEntity<List<Product>> getProductsByEstablishmentId(@PathVariable String establishmentId) {
+        try {
+            List<Product> products = productRepository.findByEstablishmentId(establishmentId);
+            return ResponseEntity.ok(products);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 }

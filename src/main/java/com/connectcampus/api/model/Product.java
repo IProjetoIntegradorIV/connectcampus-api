@@ -3,21 +3,23 @@ package com.connectcampus.api.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "establishments")
-public class Establishment {
+@Document(collection = "products")
+public class Product {
     @Id
     private String id;
+    private String establishmentId;
     private String name;
     private String description;
-    private String openingHours;
+    private String evaluation;
     private String photo;
 
-    public Establishment() {}
+    public Product() {}
 
-    public Establishment(String name, String description, String openingHours, String photo) {
+    public Product(String establishmentId, String name, String description, String evaluation, String photo) {
+        this.establishmentId = establishmentId;
         this.name = name;
         this.description = description;
-        this.openingHours = openingHours;
+        this.evaluation = evaluation;
         this.photo = photo;
     }
 
@@ -28,6 +30,15 @@ public class Establishment {
     public void setId(String id) {
         this.id = id;
     }
+
+    public String getEstablishmentId(){
+        return establishmentId;
+    }
+
+    public void setEstablishmentId(String establishmentId){
+        this.establishmentId = establishmentId;
+    }
+
 
     public String getName() {
         return name;
@@ -45,12 +56,12 @@ public class Establishment {
         this.description = description;
     }
 
-    public String getOpeningHours() {
-        return openingHours;
+    public String getEvaluation() {
+        return evaluation;
     }
 
-    public void setOpeningHours(String openingHours) {
-        this.openingHours = openingHours;
+    public void setEvaluation(String evaluation) {
+        this.evaluation = evaluation;
     }
 
     public String getPhoto() {
