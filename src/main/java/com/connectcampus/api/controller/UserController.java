@@ -4,19 +4,25 @@ import com.connectcampus.api.model.*;
 import com.connectcampus.api.repository.EstablishmentRepository;
 import com.connectcampus.api.repository.ProductRepository;
 import com.connectcampus.api.repository.UserRepository;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -138,4 +144,115 @@ public class UserController {
         }
     }
 
+    @PutMapping("/updateProfileImage")
+    public ResponseEntity<ResponseMessage> updateProfileImage(
+            @RequestParam String email,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+
+                String base64Image = saveImage(file);
+                user.setPhoto(base64Image);
+
+                userRepository.save(user);
+                return ResponseEntity.ok(new ResponseMessage("Profile image updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("User not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+    private String saveImage(MultipartFile file) throws IOException {
+        byte[] bytes = file.getBytes();
+        String base64Image = Base64.encodeBase64String(bytes);
+
+        return base64Image;
+    }
+
+    @GetMapping("/profileImage")
+    public ResponseEntity<byte[]> getProfileImage(@RequestParam String email) {
+        try {
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                String base64Image = user.getPhoto();
+                if (base64Image != null && !base64Image.isEmpty()) {
+                    byte[] imageBytes = Base64.decodeBase64(base64Image);
+                    return ResponseEntity.ok()
+                            .contentType(MediaType.IMAGE_JPEG)
+                            .body(imageBytes);
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body("No profile image found for this user.".getBytes());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("User not found.".getBytes());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(("Error: " + e.getMessage()).getBytes());
+        }
+    }
+
+    @PutMapping("/changePassword")
+    public ResponseEntity<ResponseMessage> changePassword(
+            @RequestParam String email,
+            @RequestParam String newPassword) {
+        try {
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                user.setPassword(newPassword);
+                userRepository.save(user);
+
+                return ResponseEntity.ok(new ResponseMessage("Password updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("User not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/changeName")
+    public ResponseEntity<ResponseMessage> changeName(
+            @RequestParam String email,
+            @RequestParam String newName) {
+        try {
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                user.setName(newName);
+                userRepository.save(user);
+
+                return ResponseEntity.ok(new ResponseMessage("Name updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("User not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        return user.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
