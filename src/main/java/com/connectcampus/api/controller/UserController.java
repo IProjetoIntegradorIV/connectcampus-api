@@ -68,7 +68,7 @@ public class UserController {
 
                 Optional<User> optionalUser = userRepository.findByEmail(email);
                 if (optionalUser.isEmpty()) {
-                    User newUser = new User(name, email, null, pictureUrl);
+                    User newUser = new User(name, email, null, false, pictureUrl);
                     userRepository.save(newUser);
                 }
 
@@ -172,35 +172,7 @@ public class UserController {
     private String saveImage(MultipartFile file) throws IOException {
         byte[] bytes = file.getBytes();
         String base64Image = Base64.encodeBase64String(bytes);
-
         return base64Image;
-    }
-
-    @GetMapping("/profileImage")
-    public ResponseEntity<byte[]> getProfileImage(@RequestParam String email) {
-        try {
-            Optional<User> optionalUser = userRepository.findByEmail(email);
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                String base64Image = user.getPhoto();
-                if (base64Image != null && !base64Image.isEmpty()) {
-                    byte[] imageBytes = Base64.decodeBase64(base64Image);
-                    return ResponseEntity.ok()
-                            .contentType(MediaType.IMAGE_JPEG)
-                            .body(imageBytes);
-                } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body("No profile image found for this user.".getBytes());
-                }
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("User not found.".getBytes());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(("Error: " + e.getMessage()).getBytes());
-        }
     }
 
     @PutMapping("/changePassword")
@@ -255,4 +227,51 @@ public class UserController {
         return user.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    /*
+    @GetMapping("/profileImage")
+    public ResponseEntity<String> getProfileImage(@RequestParam String email) {
+        try {
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                String base64Image = user.getPhoto();
+                if (base64Image != null && !base64Image.isEmpty()) {
+                    // Formatar a string Base64 para ser compatível com Glide no Android
+                    String imageDataUrl = "data:image/jpeg;base64," + base64Image;
+                    return ResponseEntity.ok(imageDataUrl);
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body("No profile image found for this user.");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("User not found.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error: " + e.getMessage());
+        }
+    }
+*/
+    @GetMapping("/checkEstablishmentOwner")
+    public ResponseEntity<ResponseMessage> checkEstablishmentOwner(@RequestParam String email) {
+        try {
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                boolean isOwner = user.getEstablishmentOwner();
+                return ResponseEntity.ok(new ResponseMessage("User establishmentOwner status: " + isOwner));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("User not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
 }

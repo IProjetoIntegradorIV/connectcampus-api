@@ -3,6 +3,8 @@ package com.connectcampus.api.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.security.PublicKey;
+
 @Document(collection = "users")
 public class User {
     @Id
@@ -10,12 +12,14 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private Boolean establishmentOwner;
     private String photo;
 
-    public User(String name, String email, String password, String photo) {
+    public User(String name, String email, String password, Boolean establishmentOwner ,String photo) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.establishmentOwner = establishmentOwner;
         this.photo = photo;
     }
 
@@ -49,6 +53,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Boolean getEstablishmentOwner(){
+        return establishmentOwner;
+    }
+
+    public void setEstablishmentOwner(Boolean establishmentOwner){
+        this.establishmentOwner = establishmentOwner;
     }
 
     public String getPhoto() {
