@@ -19,10 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -274,4 +271,163 @@ public class UserController {
         }
     }
 
+    @GetMapping("/getUserId")
+    public ResponseEntity<Map<String, String>> getUserIdByEmail(@RequestParam String email) {
+        try {
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isPresent()) {
+                String userId = optionalUser.get().getId();
+                Map<String, String> response = new HashMap<>();
+                response.put("userId", userId);
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "User not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error: " + e.getMessage()));
+        }
+    }
+
+
+    @GetMapping("/establishments/owner/{userId}")
+    public ResponseEntity<Map<String, String>> getEstablishmentIdByOwnerId(@PathVariable String userId) {
+        try {
+            Optional<Establishment> establishment = establishmentRepository.findByOwnerId(userId);
+            if (establishment.isPresent()) {
+                Map<String, String> response = new HashMap<>();
+                response.put("establishmentId", establishment.get().getId());
+                return ResponseEntity.ok(response);
+            } else {
+                Map<String, String> response = new HashMap<>();
+                response.put("error", "Establishment not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/isEstablishmentOwner")
+    public ResponseEntity<?> isEstablishmentOwner(@RequestParam String email) {
+        try {
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isPresent()) {
+                boolean isOwner = optionalUser.get().getEstablishmentOwner();
+                Map<String, Boolean> response = new HashMap<>();
+                response.put("isEstablishmentOwner", isOwner);
+                return ResponseEntity.ok(response);
+            } else {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("error", "User not found.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @PutMapping("/changeEstablishmentName")
+    public ResponseEntity<ResponseMessage> changeEstablishmentName(
+            @RequestParam String establishmentId,
+            @RequestParam String newName) {
+        try {
+            // Busca o estabelecimento pelo ID
+            Optional<Establishment> optionalEstablishment = establishmentRepository.findById(establishmentId);
+            if (optionalEstablishment.isPresent()) {
+                Establishment establishment = optionalEstablishment.get();
+                establishment.setName(newName); // Atualiza o nome do estabelecimento
+                establishmentRepository.save(establishment); // Salva a alteração
+
+                return ResponseEntity.ok(new ResponseMessage("Establishment name updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("Establishment not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/changeEstablishmentDescription")
+    public ResponseEntity<ResponseMessage> changeEstablishmentDescription(
+            @RequestParam String establishmentId,
+            @RequestParam String newDescription) {
+        try {
+            // Busca o estabelecimento pelo ID
+            Optional<Establishment> optionalEstablishment = establishmentRepository.findById(establishmentId);
+            if (optionalEstablishment.isPresent()) {
+                Establishment establishment = optionalEstablishment.get();
+                establishment.setDescription(newDescription); // Atualiza o nome do estabelecimento
+                establishmentRepository.save(establishment); // Salva a alteração
+
+                return ResponseEntity.ok(new ResponseMessage("Establishment description updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("Establishment not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/changeEstablishmentOpeningHours")
+    public ResponseEntity<ResponseMessage> changeEstablishmentOpeningHours(
+            @RequestParam String establishmentId,
+            @RequestParam String newOpeningHours) {
+        try {
+            // Busca o estabelecimento pelo ID
+            Optional<Establishment> optionalEstablishment = establishmentRepository.findById(establishmentId);
+            if (optionalEstablishment.isPresent()) {
+                Establishment establishment = optionalEstablishment.get();
+                establishment.setOpeningHours(newOpeningHours); // Atualiza o nome do estabelecimento
+                establishmentRepository.save(establishment); // Salva a alteração
+
+                return ResponseEntity.ok(new ResponseMessage("Establishment opening hours updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("Establishment not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/changeEstablishmentPhoto")
+    public ResponseEntity<ResponseMessage> changeEstablishmenthoto(
+            @RequestParam String establishmentId,
+            @RequestParam String newPhoto) {
+        try {
+            // Busca o estabelecimento pelo ID
+            Optional<Establishment> optionalEstablishment = establishmentRepository.findById(establishmentId);
+            if (optionalEstablishment.isPresent()) {
+                Establishment establishment = optionalEstablishment.get();
+                establishment.setPhoto(newPhoto); // Atualiza o nome do estabelecimento
+                establishmentRepository.save(establishment); // Salva a alteração
+
+                return ResponseEntity.ok(new ResponseMessage("Establishment photo updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("Establishment not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
 }

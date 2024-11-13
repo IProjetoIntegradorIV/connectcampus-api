@@ -11,14 +11,16 @@ public class Establishment {
     private String description;
     private String openingHours;
     private String photo;
+    private String ownerId;
 
     public Establishment() {}
 
-    public Establishment(String name, String description, String openingHours, String photo) {
+    public Establishment(String name, String description, String openingHours, String photo, String ownerId) {
         this.name = name;
         this.description = description;
         this.openingHours = openingHours;
         this.photo = photo;
+        this.ownerId = ownerId;
     }
 
     public String getId() {
@@ -59,5 +61,13 @@ public class Establishment {
 
     public void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    public String getOwnerId(){
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId){
+        this.ownerId = ownerId;
     }
 }
