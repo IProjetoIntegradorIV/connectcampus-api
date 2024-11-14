@@ -430,4 +430,100 @@ public class UserController {
                     .body(new ResponseMessage("Error: " + e.getMessage()));
         }
     }
+
+    @PutMapping("/changeProductName")
+    public ResponseEntity<ResponseMessage> changeProductName(
+            @RequestParam String productId,
+            @RequestParam String newName) {
+        try {
+            // Busca o estabelecimento pelo ID
+            Optional<Product> optionalProduct = productRepository.findById(productId);
+            if (optionalProduct.isPresent()) {
+                Product product = optionalProduct.get();
+                product.setName(newName); // Atualiza o nome do produto
+                productRepository.save(product); // Salva a alteração
+
+                return ResponseEntity.ok(new ResponseMessage("Product name updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("Product not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/changeProductDescription")
+    public ResponseEntity<ResponseMessage> changeProductDescription(
+            @RequestParam String productId,
+            @RequestParam String newDescription) {
+        try {
+            // Busca o estabelecimento pelo ID
+            Optional<Product> optionalProduct = productRepository.findById(productId);
+            if (optionalProduct.isPresent()) {
+                Product product = optionalProduct.get();
+                product.setDescription(newDescription); // Atualiza a descrição do produto
+                productRepository.save(product); // Salva a alteração
+
+                return ResponseEntity.ok(new ResponseMessage("Product description updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("Product not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/changeProductPrice")
+    public ResponseEntity<ResponseMessage> changeProductPrice(
+            @RequestParam String productId,
+            @RequestParam String newPrice) {
+        try {
+            // Busca o estabelecimento pelo ID
+            Optional<Product> optionalProduct = productRepository.findById(productId);
+            if (optionalProduct.isPresent()) {
+                Product product = optionalProduct.get();
+                product.setPrice(newPrice); // Atualiza o preço do produto
+                productRepository.save(product); // Salva a alteração
+
+                return ResponseEntity.ok(new ResponseMessage("Product price updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("Product not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/changeProductPhoto")
+    public ResponseEntity<ResponseMessage> changeProductPhoto(
+            @RequestParam String productId,
+            @RequestParam String newPhoto) {
+        try {
+            // Busca o estabelecimento pelo ID
+            Optional<Product> optionalProduct = productRepository.findById(productId);
+            if (optionalProduct.isPresent()) {
+                Product product = optionalProduct.get();
+                product.setPhoto(newPhoto); // Atualiza a foto do produto
+                productRepository.save(product); // Salva a alteração
+
+                return ResponseEntity.ok(new ResponseMessage("Product photo updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("Product not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
 }
