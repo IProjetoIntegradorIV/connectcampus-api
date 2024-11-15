@@ -526,4 +526,40 @@ public class UserController {
                     .body(new ResponseMessage("Error: " + e.getMessage()));
         }
     }
+
+    @DeleteMapping("/products/{productId}")
+    public ResponseEntity<ResponseMessage> deleteProductById(@PathVariable String productId) {
+        try {
+            Optional<Product> product = productRepository.findById(productId);
+            if (product.isPresent()) {
+                productRepository.deleteById(productId);
+                return ResponseEntity.ok(new ResponseMessage("Product deleted successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("Product not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/establishment/{establishmentId}")
+    public ResponseEntity<ResponseMessage> deleteEstablishmentById(@PathVariable String establishmentId) {
+        try {
+            Optional<Establishment> establishment = establishmentRepository.findById(establishmentId);
+            if (establishment.isPresent()) {
+                establishmentRepository.deleteById(establishmentId);
+                return ResponseEntity.ok(new ResponseMessage("Establishment deleted successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("Establishment not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
 }
