@@ -562,4 +562,16 @@ public class UserController {
                     .body(new ResponseMessage("Error: " + e.getMessage()));
         }
     }
+
+    @GetMapping("/establishments/search")
+    public ResponseEntity<List<Establishment>> searchEstablishmentsByName(@RequestParam String name) {
+        try {
+            List<Establishment> establishments = establishmentRepository.findByNameContainingIgnoreCase(name);
+            return ResponseEntity.ok(establishments);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 }
