@@ -587,5 +587,27 @@ public class UserController {
         }
     }
 
+    @PutMapping("/changeUserPhoto")
+    public ResponseEntity<ResponseMessage> changeUserPhoto(
+            @RequestParam String userId,
+            @RequestParam String newPhoto) {
+        try {
+            // Busca o usuário pelo ID
+            Optional<User> optionalUser = userRepository.findById(userId);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                user.setPhoto(newPhoto); // Atualiza a foto do usuário
+                userRepository.save(user); // Salva a alteração
 
+                return ResponseEntity.ok(new ResponseMessage("User photo updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("User not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
 }
