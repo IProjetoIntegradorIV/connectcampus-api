@@ -574,4 +574,18 @@ public class UserController {
         }
     }
 
+    @PostMapping("/createProduct")
+    public ResponseEntity<ResponseMessage> createProduct(@RequestBody Product product) {
+        try {
+            productRepository.save(product);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ResponseMessage("Product created successfully."));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+
 }
