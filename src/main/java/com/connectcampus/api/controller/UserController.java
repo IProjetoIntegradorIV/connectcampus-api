@@ -2,6 +2,7 @@ package com.connectcampus.api.controller;
 
 import com.connectcampus.api.model.*;
 import com.connectcampus.api.repository.EstablishmentRepository;
+import com.connectcampus.api.repository.EvaluateRepository;
 import com.connectcampus.api.repository.ProductRepository;
 import com.connectcampus.api.repository.UserRepository;
 import org.apache.commons.codec.binary.Base64;
@@ -225,33 +226,6 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /*
-    @GetMapping("/profileImage")
-    public ResponseEntity<String> getProfileImage(@RequestParam String email) {
-        try {
-            Optional<User> optionalUser = userRepository.findByEmail(email);
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                String base64Image = user.getPhoto();
-                if (base64Image != null && !base64Image.isEmpty()) {
-                    // Formatar a string Base64 para ser compatível com Glide no Android
-                    String imageDataUrl = "data:image/jpeg;base64," + base64Image;
-                    return ResponseEntity.ok(imageDataUrl);
-                } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body("No profile image found for this user.");
-                }
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("User not found.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: " + e.getMessage());
-        }
-    }
-*/
     @GetMapping("/checkEstablishmentOwner")
     public ResponseEntity<ResponseMessage> checkEstablishmentOwner(@RequestParam String email) {
         try {
@@ -610,4 +584,61 @@ public class UserController {
                     .body(new ResponseMessage("Error: " + e.getMessage()));
         }
     }
+
+    @Autowired
+    private EvaluateRepository evaluateRepository;
+
+    @PostMapping("/evaluate")
+    public ResponseEntity<ResponseMessage> submitEvaluation(
+            @RequestParam String userId,
+            @RequestParam String productId,
+            @RequestParam float rating) {
+        try {
+            Evaluate evaluate = new Evaluate(userId, productId, rating);
+            evaluateRepository.save(evaluate);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ResponseMessage("Evaluation submitted successfully."));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/evaluations/{productId}")
+    public ResponseEntity<List<Evaluate>> getEvaluationsByProductId(@PathVariable String productId) {
+        try {
+            List<Evaluate> evaluations = evaluateRepository.findByProductId(productId);
+            return ResponseEntity.ok(evaluations);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping("/changeProductEvaluation")
+    public ResponseEntity<ResponseMessage> changeProductEvaluation(
+            @RequestParam String productId,
+            @RequestParam String newEvaluation) {
+        try {
+            // Busca o produto pelo ID
+            Optional<Product> optionalProduct = productRepository.findById(productId);
+            if (optionalProduct.isPresent()) {
+                Product product = optionalProduct.get();
+                product.setEvaluation(newEvaluation); // Atualiza a avaliação do produto
+                productRepository.save(product); // Salva a alteração
+
+                return ResponseEntity.ok(new ResponseMessage("Product evaluation updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("Product not found."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage("Error: " + e.getMessage()));
+        }
+    }
+
 }
