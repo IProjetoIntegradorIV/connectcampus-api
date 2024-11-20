@@ -1,7 +1,10 @@
 package com.connectcampus.api.model;
 
-public class GoogleLoginRequest{
+public class GoogleLoginRequest {
     private String idToken;
+
+    public GoogleLoginRequest() {
+    }
 
     public GoogleLoginRequest(String idToken) {
         this.idToken = idToken;
@@ -16,33 +19,30 @@ public class GoogleLoginRequest{
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "IdToken: " + idToken;
     }
 
     @Override
-    public boolean equals(Object obj){
-        if(obj == null)
+    public boolean equals(Object obj) {
+        if (obj == null)
             return false;
-        if(obj == this)
+        if (obj == this)
             return true;
-        if(obj.getClass() != this.getClass())
+        if (obj.getClass() != this.getClass())
             return false;
 
         GoogleLoginRequest g = (GoogleLoginRequest) obj;
 
-        if(g.idToken != this.idToken)
-            return false;
-
-        return true;
+        return idToken != null && idToken.equals(g.idToken);
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         int ret = 1;
-        ret = ret * 11 + idToken.hashCode();
+        ret = ret * 11 + (idToken != null ? idToken.hashCode() : 0);
 
-        if(ret < 0)
+        if (ret < 0)
             ret = -ret;
 
         return ret;
