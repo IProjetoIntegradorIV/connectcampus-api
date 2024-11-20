@@ -3,10 +3,8 @@ package com.connectcampus.api.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.security.PublicKey;
-
 @Document(collection = "users")
-public class User {
+public class User{
     @Id
     private String id;
     private String name;
@@ -70,4 +68,58 @@ public class User {
     public void setPhoto(String photo) {
         this.photo = photo;
     }
+
+    @Override
+    public String toString(){
+        return "Id: " + id +
+                ", name: " + name +
+                ", email: " + email +
+                ", password: " + password +
+                ", establishmentOwner: " + establishmentOwner +
+                ", photo url: " + photo;
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(obj == null)
+            return false;
+        if(obj == this)
+            return true;
+        if(obj.getClass() != this.getClass())
+            return false;
+
+        User u = (User) obj;
+
+        if(u.id != this.id)
+            return false;
+        if(u.name != this.name)
+            return false;
+        if(u.email != this.email)
+            return false;
+        if(u.password != this.password)
+            return false;
+        if(u.photo != this.photo)
+            return false;
+        if(u.establishmentOwner != this.establishmentOwner)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode(){
+        int ret = 1;
+        ret = ret * 11 + id.hashCode();
+        ret = ret * 11 + name.hashCode();
+        ret = ret * 11 + email.hashCode();
+        ret = ret * 11 + password.hashCode();
+        ret = ret * 11 + photo.hashCode();
+        ret = ret * 11 + Boolean.hashCode(establishmentOwner);
+
+        if(ret < 0)
+            ret = -ret;
+
+        return ret;
+    }
+
 }
