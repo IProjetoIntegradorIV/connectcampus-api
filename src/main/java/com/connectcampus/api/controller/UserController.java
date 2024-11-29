@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @PostMapping("/login/google")
-    public ResponseEntity<String> googleLogin(@RequestBody GoogleLoginRequest googleLoginRequest) {
+    public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRequest googleLoginRequest) {
         try {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
@@ -50,28 +50,26 @@ public class UserController {
             GoogleIdToken idToken = verifier.verify(googleLoginRequest.getIdToken());
             if (idToken != null) {
                 GoogleIdToken.Payload payload = idToken.getPayload();
-
                 String email = payload.getEmail();
-                String name = (String) payload.get("name");
-                String pictureUrl = (String) payload.get("picture");
 
                 Optional<User> optionalUser = userRepository.findByEmail(email);
                 if (optionalUser.isEmpty()) {
-                    User newUser = new User(name, email, null, false, pictureUrl);
+                    User newUser = new User((String) payload.get("name"), email, null, false, (String) payload.get("picture"));
                     userRepository.save(newUser);
                 }
 
-                return ResponseEntity.ok("Google login successful.");
+                // Retorna o email do usuário ao invés de uma mensagem genérica
+                return ResponseEntity.ok(email);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google ID Token.");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error during Google login: " + e.getMessage());
         }
     }
+
 
     @PostMapping("/createUser")
     public ResponseEntity<ResponseMessage> createUser(@RequestBody User user) {
