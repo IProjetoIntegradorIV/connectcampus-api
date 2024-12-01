@@ -16,15 +16,19 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/establishment")
 public class EstablishmentController {
+
+    // Injeta automaticamente o repositório de estabelecimentos para interagir com o banco de dados
     @Autowired
     private EstablishmentRepository establishmentRepository;
 
     @GetMapping("/establishments")
     public ResponseEntity<List<Establishment>> getAllEstablishments() {
         try {
+            // Busca todos os estabelecimentos no banco de dados
             List<Establishment> establishments = establishmentRepository.findAll();
             return ResponseEntity.ok(establishments);
         } catch (Exception e) {
+            // Captura e exibe qualquer erro no console
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -33,6 +37,7 @@ public class EstablishmentController {
     @GetMapping("/establishments/{id}")
     public ResponseEntity<Establishment> getEstablishmentById(@PathVariable("id") String id) {
         try {
+            // Busca o estabelecimento pelo ID fornecido
             Optional<Establishment> establishment = establishmentRepository.findById(id);
             return establishment.map(ResponseEntity::ok)
                     .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
@@ -45,6 +50,7 @@ public class EstablishmentController {
     @GetMapping("/establishments/owner/{userId}")
     public ResponseEntity<Map<String, String>> getEstablishmentIdByOwnerId(@PathVariable String userId) {
         try {
+            // Busca o estabelecimento pelo ID do proprietário
             Optional<Establishment> establishment = establishmentRepository.findByOwnerId(userId);
             if (establishment.isPresent()) {
                 Map<String, String> response = new HashMap<>();
@@ -65,16 +71,14 @@ public class EstablishmentController {
 
     @PutMapping("/changeEstablishmentName")
     public ResponseEntity<ResponseMessage> changeEstablishmentName(
-            @RequestParam String establishmentId,
-            @RequestParam String newName) {
+            @RequestParam String establishmentId, // ID do estabelecimento
+            @RequestParam String newName) { // Novo nome do estabelecimento
         try {
-            // Busca o estabelecimento pelo ID
             Optional<Establishment> optionalEstablishment = establishmentRepository.findById(establishmentId);
             if (optionalEstablishment.isPresent()) {
                 Establishment establishment = optionalEstablishment.get();
-                establishment.setName(newName); // Atualiza o nome do estabelecimento
-                establishmentRepository.save(establishment); // Salva a alteração
-
+                establishment.setName(newName); // Atualiza o nome
+                establishmentRepository.save(establishment); // Salva no banco
                 return ResponseEntity.ok(new ResponseMessage("Establishment name updated successfully."));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -92,13 +96,11 @@ public class EstablishmentController {
             @RequestParam String establishmentId,
             @RequestParam String newDescription) {
         try {
-            // Busca o estabelecimento pelo ID
             Optional<Establishment> optionalEstablishment = establishmentRepository.findById(establishmentId);
             if (optionalEstablishment.isPresent()) {
                 Establishment establishment = optionalEstablishment.get();
-                establishment.setDescription(newDescription); // Atualiza o nome do estabelecimento
-                establishmentRepository.save(establishment); // Salva a alteração
-
+                establishment.setDescription(newDescription); // Atualiza a descrição
+                establishmentRepository.save(establishment); // Salva no banco
                 return ResponseEntity.ok(new ResponseMessage("Establishment description updated successfully."));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -116,13 +118,11 @@ public class EstablishmentController {
             @RequestParam String establishmentId,
             @RequestParam String newOpeningHours) {
         try {
-            // Busca o estabelecimento pelo ID
             Optional<Establishment> optionalEstablishment = establishmentRepository.findById(establishmentId);
             if (optionalEstablishment.isPresent()) {
                 Establishment establishment = optionalEstablishment.get();
-                establishment.setOpeningHours(newOpeningHours); // Atualiza o nome do estabelecimento
-                establishmentRepository.save(establishment); // Salva a alteração
-
+                establishment.setOpeningHours(newOpeningHours); // Atualiza o horário
+                establishmentRepository.save(establishment); // Salva no banco
                 return ResponseEntity.ok(new ResponseMessage("Establishment opening hours updated successfully."));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -140,13 +140,11 @@ public class EstablishmentController {
             @RequestParam String establishmentId,
             @RequestParam String newPhoto) {
         try {
-            // Busca o estabelecimento pelo ID
             Optional<Establishment> optionalEstablishment = establishmentRepository.findById(establishmentId);
             if (optionalEstablishment.isPresent()) {
                 Establishment establishment = optionalEstablishment.get();
-                establishment.setPhoto(newPhoto); // Atualiza o nome do estabelecimento
-                establishmentRepository.save(establishment); // Salva a alteração
-
+                establishment.setPhoto(newPhoto); // Atualiza a foto
+                establishmentRepository.save(establishment); // Salva no banco
                 return ResponseEntity.ok(new ResponseMessage("Establishment photo updated successfully."));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -164,7 +162,7 @@ public class EstablishmentController {
         try {
             Optional<Establishment> establishment = establishmentRepository.findById(establishmentId);
             if (establishment.isPresent()) {
-                establishmentRepository.deleteById(establishmentId);
+                establishmentRepository.deleteById(establishmentId); // Remove do banco
                 return ResponseEntity.ok(new ResponseMessage("Establishment deleted successfully."));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -187,5 +185,5 @@ public class EstablishmentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
 }
+

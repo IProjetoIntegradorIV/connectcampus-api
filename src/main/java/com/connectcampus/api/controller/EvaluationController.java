@@ -14,22 +14,28 @@ import java.util.List;
 @RequestMapping("/api/evaluation")
 public class EvaluationController {
 
+    // Injeta automaticamente o repositório de avaliações, permitindo acesso ao banco de dados
     @Autowired
     private EvaluateRepository evaluateRepository;
 
     @PostMapping("/evaluate")
     public ResponseEntity<ResponseMessage> submitEvaluation(
-            @RequestParam String userId,
-            @RequestParam String productId,
-            @RequestParam float rating) {
+            @RequestParam String userId, // ID do usuário que realiza a avaliação
+            @RequestParam String productId, // ID do produto avaliado
+            @RequestParam float rating) { // Nota dada ao produto
         try {
+            // Cria um novo objeto de avaliação com os dados recebidos
             Evaluate evaluate = new Evaluate(userId, productId, rating);
+            // Salva a avaliação no banco de dados
             evaluateRepository.save(evaluate);
 
+            // Retorna uma mensagem de sucesso com status HTTP 201 (Created)
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ResponseMessage("Evaluation submitted successfully."));
         } catch (Exception e) {
+            // Captura e exibe qualquer erro no console
             e.printStackTrace();
+            // Retorna uma mensagem de erro com status HTTP 500 (Internal Server Error)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseMessage("Error: " + e.getMessage()));
         }
@@ -38,12 +44,17 @@ public class EvaluationController {
     @GetMapping("/evaluations/{productId}")
     public ResponseEntity<List<Evaluate>> getEvaluationsByProductId(@PathVariable String productId) {
         try {
+            // Busca todas as avaliações associadas ao ID do produto fornecido
             List<Evaluate> evaluations = evaluateRepository.findByProductId(productId);
+            // Retorna a lista de avaliações com status HTTP 200 (OK)
             return ResponseEntity.ok(evaluations);
         } catch (Exception e) {
+            // Captura e exibe qualquer erro no console
             e.printStackTrace();
+            // Retorna uma mensagem de erro com status HTTP 500 (Internal Server Error)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
 }
+

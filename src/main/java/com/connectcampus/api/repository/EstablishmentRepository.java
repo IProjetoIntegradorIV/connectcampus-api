@@ -9,5 +9,4 @@ import java.util.Optional;
 public interface EstablishmentRepository extends MongoRepository<Establishment, String> {
     Optional<Establishment> findByOwnerId(String ownerId);
     List<Establishment> findByNameContainingIgnoreCase(String name);
-
 }
